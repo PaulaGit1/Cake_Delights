@@ -1,0 +1,46 @@
+CREATE TABLE `cake_delights`.`tbl_roles` ( `role_id` INT NOT NULL AUTO_INCREMENT , `role_name` ENUM('Administrator','Server','Purchaser/Client','') NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`role_id`)) ENGINE = InnoDB;
+
+CREATE TABLE `cake_delights`.`tbl_users` ( `user_id` INT NOT NULL AUTO_INCREMENT , `surname` VARCHAR(20) NOT NULL , `first_name` VARCHAR(20) NOT NULL , `othername` VARCHAR(20) NOT NULL , `gender` ENUM('Male','Female') NOT NULL , `dob` DATE NOT NULL , `email` VARCHAR(40) NOT NULL , `password` VARCHAR(60) NOT NULL , `profile_pic` VARCHAR(60) NOT NULL , `role_id` INT(11) NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`user_id`), UNIQUE (`email`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_users`ADD CONSTRAINT roles_FK FOREIGN KEY (`role_id`) REFERENCES `tbl_roles`(`role_id`);
+
+CREATE TABLE `cake_delights`.`tbl_foodcategories` ( `category_id` INT NOT NULL AUTO_INCREMENT , `category_name` VARCHAR(20) NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`category_id`)) ENGINE = InnoDB;
+
+CREATE TABLE `cake_delights`.`tbl_food` ( `food_id` INT NOT NULL AUTO_INCREMENT , `food_name` VARCHAR(20) NOT NULL , `food_image` VARCHAR(40) NOT NULL , `created_on` DATETIME NOT NULL , `updated_on` DATETIME NOT NULL , `food_category` INT NOT NULL DEFAULT '0' , `food_buyingprice` DOUBLE NOT NULL DEFAULT '0' , `food_sellingprice` DOUBLE NOT NULL DEFAULT '0' , `admin_id` INT NOT NULL , `quantity` INT NOT NULL DEFAULT '0' , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`food_id`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_food`ADD CONSTRAINT category_FK FOREIGN KEY (`food_category`) REFERENCES `tbl_foodcategories`(`category_id`);
+
+ALTER TABLE `tbl_food`ADD CONSTRAINT admin_FK FOREIGN KEY (`admin_id`) REFERENCES `tbl_users`(`user_id`);
+
+CREATE TABLE `cake_delights`.`tbl_order` ( `order_id` INT NOT NULL AUTO_INCREMENT , `customer_id` INT NOT NULL , `server_id` INT NOT NULL , `created_on` DATETIME NOT NULL , `updated_on` DATETIME NOT NULL , `order_total` DOUBLE NOT NULL DEFAULT '0' , `order_status` ENUM('Paid','Unpaid') NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`order_id`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_order`ADD CONSTRAINT customer_FK FOREIGN KEY (`customer_id`) REFERENCES `tbl_users`(`user_id`);
+
+ALTER TABLE `tbl_order`ADD CONSTRAINT server_FK FOREIGN KEY (`server_id`) REFERENCES `tbl_users`(`user_id`);
+
+CREATE TABLE `cake_delights`.`tbl_orderdetails` ( `orderdetails_id` INT NOT NULL AUTO_INCREMENT , `food_name` VARCHAR(20) NOT NULL , `food_id` INT NOT NULL , `quantity` INT NOT NULL , `price` DOUBLE NOT NULL DEFAULT '0' , `order_id` INT NOT NULL , `created_on` DATETIME NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`orderdetails_id`) ) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_orderdetails`ADD CONSTRAINT food_FK FOREIGN KEY (`food_id`) REFERENCES `tbl_food`(`food_id`);
+
+ALTER TABLE `tbl_orderdetails`ADD CONSTRAINT order_FK FOREIGN KEY (`order_id`) REFERENCES `tbl_order`(`order_id`);
+
+CREATE TABLE `cake_delights`.`tbl_wallet` ( `wallet_id` INT NOT NULL AUTO_INCREMENT , `user_id` INT NOT NULL , `amount` DOUBLE NOT NULL DEFAULT '0' , `created_on` DATETIME NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`wallet_id`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_wallet`ADD CONSTRAINT client_FK FOREIGN KEY (`user_id`) REFERENCES `tbl_users`(`user_id`);
+
+CREATE TABLE `cake_delights`.`tbl_payment` ( `payment_id` INT NOT NULL AUTO_INCREMENT , `wallet_id` INT NOT NULL , `server_id` INT NOT NULL , `order_id` INT NOT NULL , `amount` DOUBLE NOT NULL DEFAULT '0' , `created_on` DATETIME NOT NULL , `update_on` DATETIME NOT NULL , `isdeleted` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`payment_id`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_payment`ADD CONSTRAINT wallet1_FK FOREIGN KEY (`wallet_id`) REFERENCES `tbl_wallet`(`wallet_id`);
+
+ALTER TABLE `tbl_payment`ADD CONSTRAINT server1_FK FOREIGN KEY (`server_id`) REFERENCES `tbl_users`(`user_id`);
+
+ALTER TABLE `tbl_payment`ADD CONSTRAINT order1_FK FOREIGN KEY (`order_id`) REFERENCES `tbl_order`(`order_id`);
+
+INSERT INTO `tbl_roles`(`role_id`, `role_name`, `isdeleted`) VALUES ('NULL','Administrator','NULL');
+
+INSERT INTO `tbl_users`(`user_id`, `surname`, `first_name`, `othername`, `gender`, `dob`, `email`, `password`, `profile_pic`, `role_id`, `isdeleted`) VALUES ('NULL','Paula','Njenga','Admin','Female','1999/05/12','paula.njenga@gmail.com',md5('143109'),'admin.png','1','0');
+
+CREATE TABLE `cake_delights`.`tbl_ratings` ( `rating_id` INT NOT NULL AUTO_INCREMENT , `server_id` INT NOT NULL , `created_on` DATETIME NOT NULL , `updated_on` DATETIME NOT NULL , `rating` TEXT NOT NULL , PRIMARY KEY (`rating_id`)) ENGINE = InnoDB;
+
+ALTER TABLE `tbl_ratings`ADD CONSTRAINT waiter_or_server_FK FOREIGN KEY (`server_id`) REFERENCES `tbl_order`(`server_id`);
+
